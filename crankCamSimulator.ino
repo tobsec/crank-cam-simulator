@@ -16,13 +16,12 @@ int camOffset = 10; // 0 - end of missing pulse
 
 // --------------------------------------------
 
-void setup() {
-  // put your setup code here, to run once:
-
+void setup()
+{
   pinMode(PIN_CAM, OUTPUT);
   pinMode(PIN_CRANK, OUTPUT);
 
-  cli();//stop interrupts
+  cli(); //stop interrupts
 
   //set timer0 interrupt at 2kHz
   TCCR0A = 0;// set entire TCCR2A register to 0
@@ -37,12 +36,12 @@ void setup() {
   // enable timer compare interrupt
   TIMSK0 |= (1 << OCIE0A);
 
-  sei();//allow interrupts
+  sei(); //allow interrupts
 }
 
-
-ISR(TIMER0_COMPA_vect){//timer0 interrupt 2kHz toggles pin 8
-//generates pulse wave of frequency 2kHz/2 = 1kHz (takes two cycles for full wave- toggle high then toggle low)
+ISR(TIMER0_COMPA_vect)
+{
+  //timer0 interrupt 2kHz
 
   // Crank Pulse
   if (crankCnt <= ((TEETH-GAP+1)*2) )
@@ -71,62 +70,14 @@ ISR(TIMER0_COMPA_vect){//timer0 interrupt 2kHz toggles pin 8
       digitalWrite(PIN_CAM, INVERT_CAM ? HIGH : LOW);
   }
 
-
   crankCnt++;
-  
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+void loop()
+{
+  // Read from a potentiometer the shift between crank and cam signal
+  int potiVal = analogRead(PIN_POTI);
+  camOffset = map(potiVal, 0, 1023, 0, TEETH);
 
-#if 0
-
-digitalWrite(PIN_CAM, HIGH);
-delay(4);
-
-digitalWrite(PIN_CRANK, HIGH);
-delay(6);
-digitalWrite(PIN_CRANK, LOW);
-delay(12);
-digitalWrite(PIN_CRANK, HIGH);
-delay(6);
-digitalWrite(PIN_CRANK, LOW);
-delay(12);
-digitalWrite(PIN_CRANK, HIGH);
-delay(6);
-digitalWrite(PIN_CRANK, LOW);
-delay(12);
-digitalWrite(PIN_CRANK, HIGH);
-delay(6);
-digitalWrite(PIN_CRANK, LOW);
-
-delay(8);
-digitalWrite(PIN_CAM, LOW);
-delay(4);
-
-digitalWrite(PIN_CRANK, HIGH);
-delay(6);
-digitalWrite(PIN_CRANK, LOW);
-delay(12);
-digitalWrite(PIN_CRANK, HIGH);
-delay(6);
-digitalWrite(PIN_CRANK, LOW);
-delay(12);
-digitalWrite(PIN_CRANK, HIGH);
-delay(6);
-digitalWrite(PIN_CRANK, LOW);
-delay(12);
-digitalWrite(PIN_CRANK, HIGH);
-delay(6);
-digitalWrite(PIN_CRANK, LOW);
-
-delay(8);
-
-#endif
-
-int potiVal = analogRead(PIN_POTI);
-camOffset = map(potiVal, 0, 1023, 0, TEETH);
-
-delay(10);
-
+  delay(10);
 }
